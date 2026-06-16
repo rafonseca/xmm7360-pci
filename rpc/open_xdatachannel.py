@@ -253,6 +253,7 @@ else:
 
 devices = manager.GetDevices()
 
+devpath = None
 for d in devices:
     dev_proxy = system_bus.get_object("org.freedesktop.NetworkManager", d)
     prop_iface = dbus.Interface(dev_proxy, "org.freedesktop.DBus.Properties")
@@ -267,4 +268,10 @@ for d in devices:
                 "org.freedesktop.NetworkManager.Device", "Managed", dbus.Boolean(1)
             )
 
-manager.ActivateConnection(connection_path, devpath, "/")
+if devpath is not None:
+    manager.ActivateConnection(connection_path, devpath, "/")
+else:
+    logging.warning(
+        "Could not find wwan0 in NetworkManager; "
+        "connection profile created but not activated"
+    )
