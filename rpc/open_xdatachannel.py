@@ -12,6 +12,8 @@ import time
 
 import rpc
 import logging
+import subprocess
+
 # must do this before importing pyroute2
 logging.basicConfig(level=logging.DEBUG)
 
@@ -125,7 +127,11 @@ ipr.addr("add", index=idx, address=ip_addr)
 
 
 if not cfg.nodefaultroute:
-    ipr.route("add", dst="default", priority=cfg.metric, oif=idx)
+    subprocess.run(
+        ["ip", "route", "add", "default", "dev", "wwan0", "metric", str(cfg.metric)],
+        check=True,
+    )
+    logging.info("Added default route via wwan0 with metric %s" % cfg.metric)
 
 # Add DNS values to /etc/resolv.conf
 if not cfg.noresolv:
